@@ -1,25 +1,20 @@
 package com.vaadin.tapio.googlemaps.client;
 
 import java.util.ArrayList;
-
 import com.google.gwt.ajaxloader.client.AjaxLoader;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.maps.client.LoadApi;
-import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.LoadApi.LoadLibrary;
-import com.google.gwt.maps.client.base.LatLng;
+import com.google.gwt.maps.client.placeslib.AutocompleteType;
+import com.vaadin.client.annotations.OnStateChange;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.communication.StateChangeEvent;
 import com.vaadin.client.ui.AbstractComponentConnector;
-import com.vaadin.client.ui.layout.ElementResizeEvent;
-import com.vaadin.client.ui.layout.ElementResizeListener;
 import com.vaadin.shared.ui.Connect;
 import com.vaadin.tapio.googlemaps.AutocompleteComponent;
 import com.vaadin.tapio.googlemaps.client.events.AutocompletePlaceChangeListener;
 import com.vaadin.tapio.googlemaps.client.rpcs.AutocompletePlaceChangedRpc;
 
-// Connector binds client-side widget class to server-side component class
-// Connector lives in the client and the @Connect annotation specifies the
-// corresponding server-side component
 @Connect(AutocompleteComponent.class)
 public class AutocompleteComponentConnector extends AbstractComponentConnector implements AutocompletePlaceChangeListener{
 
@@ -84,43 +79,11 @@ public class AutocompleteComponentConnector extends AbstractComponentConnector i
     }
     
     protected void initAutocompleteComponent() {
+        GWT.log("************Init auto complete component********");
         getWidget().init();
 
-        updateFromState(true);
-    }
-    
-    protected void updateFromState(boolean initial) {
-//        updateVisibleAreaAndCenterBoundLimits();
-//
-//        LatLng center = LatLng.newInstance(getState().center.getLat(),
-//            getState().center.getLon());
-//        getWidget().setCenter(center);
-//        getWidget().setZoom(getState().zoom);
-//        getWidget().setTrafficLayerVisible(getState().trafficLayerVisible);
-//        getWidget().setMarkers(getState().markers.values());
-//        getWidget().setPolygonOverlays(getState().polygons);
-//        getWidget().setPolylineOverlays(getState().polylines);
-//        getWidget().setKmlLayers(getState().kmlLayers);
-//        getWidget().setMapType(getState().mapTypeId);
-//        getWidget().setControls(getState().controls);
-//        getWidget().setDraggable(getState().draggable);
-//        getWidget().setKeyboardShortcutsEnabled(
-//            getState().keyboardShortcutsEnabled);
-//        getWidget().setScrollWheelEnabled(getState().scrollWheelEnabled);
-//        getWidget().setMinZoom(getState().minZoom);
-//        getWidget().setMaxZoom(getState().maxZoom);
-//        getWidget().setInfoWindows(getState().infoWindows.values());
-//
-//        if (getState().fitToBoundsNE != null
-//            && getState().fitToBoundsSW != null) {
-//            getWidget().fitToBounds(getState().fitToBoundsNE,
-//                getState().fitToBoundsSW);
-//        }
-//        getWidget().updateOptionsAndPanning();
-//        if (initial) {
-//            getWidget().triggerResize();
-//        }
-//		onConnectorHierarchyChange(null);
+        onBoundsChange();
+        onTypesChange();
     }
 	
     // We must implement getWidget() to cast to correct type 
@@ -135,6 +98,18 @@ public class AutocompleteComponentConnector extends AbstractComponentConnector i
     public AutocompleteComponentState getState() {
         return (AutocompleteComponentState) super.getState();
     }
+    
+    @OnStateChange(value={"boundsNE", "boundsSW"})
+    private void onBoundsChange() {
+        GWT.log("Auto complete component bounds changed to NE(" +  getState().boundsNE.getLat() + ", " + getState().boundsNE.getLon() + "), SW(" + getState().boundsSW.getLat() + ", " + getState().boundsSW.getLon() + ")");
+        getWidget().setBounds( getState().boundsNE, getState().boundsSW );
+    }
+    
+    @OnStateChange(value={"types"})
+    private void onTypesChange() {
+        GWT.log( "Auto complete component type's count " + getState().types.size() );
+        getWidget().setTypes( getState().types.toArray( new AutocompleteType[getState().types.size()] ) );
+    }
 
     // Whenever the state changes in the server-side, this method is called
     @Override
@@ -147,16 +122,6 @@ public class AutocompleteComponentConnector extends AbstractComponentConnector i
         } else if (getWidget().autoComplete == null) {
             initAutocompleteComponent();
         }
-        
-        // State is directly readable in the client after it is set in server
-//        if( getState().boundsSW != null && getState().boundsNE != null ) {
-//            LatLng sw = LatLng.newInstance(getState().boundsSW.getLat(), getState().boundsSW.getLon());
-//            LatLng ne = LatLng.newInstance(getState().boundsNE.getLat(), getState().boundsNE.getLon());
-//
-//            getWidget().setBounds(LatLngBounds.newInstance(sw, ne));
-//        } else {
-//        	getWidget().setBounds( null );
-//        }
     }
 
 	@Override

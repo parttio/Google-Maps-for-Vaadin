@@ -34,12 +34,10 @@ public class AutocompleteComponentWidget extends TextBox {
 
         Element element = getElement();
 
-        AutocompleteType[] types = new AutocompleteType[2];
-        types[0] = AutocompleteType.ESTABLISHMENT;
-        types[1] = AutocompleteType.GEOCODE;
-
         options = AutocompleteOptions.newInstance();
-        options.setTypes(types);
+        
+        // Initial type is EXPLICIT_TYPES
+//        options.setTypes( AutocompleteType.ESTABLISHMENT, AutocompleteType.GEOCODE );
 //        options.setBounds(mapWidget.getBounds());
 
         autoComplete = Autocomplete.newInstance(element, options);
@@ -65,11 +63,24 @@ public class AutocompleteComponentWidget extends TextBox {
 	 * @see com.google.gwt.maps.client.placeslib.AutocompleteOptions#setBounds()
 	 * @param bounds
 	 */
-	public void setBounds(LatLngBounds bounds) {
-		options.setBounds(bounds);
+	public void setBounds(LatLon boundsNE, LatLon boundsSW) {
+        LatLng ne = LatLng.newInstance(boundsNE.getLat(), boundsNE.getLon());
+        LatLng sw = LatLng.newInstance(boundsSW.getLat(), boundsSW.getLon());
+
+        LatLngBounds bounds = LatLngBounds.newInstance(sw, ne);
+        
+        autoComplete.setBounds(bounds);
 	}
 	
 	public void setPlaceChangeListener(AutocompletePlaceChangeListener placeChangeListener) {
 		this.placeChangeListener = placeChangeListener;
+	}
+	
+	/**
+	 * @see com.google.gwt.maps.client.placeslib.AutocompleteOptions#setTypes()
+	 * @param bounds
+	 */
+	public void setTypes(AutocompleteType... types) {
+		this.options.setTypes(types);
 	}
 }

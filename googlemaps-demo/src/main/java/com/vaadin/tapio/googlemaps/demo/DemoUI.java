@@ -6,9 +6,12 @@ import javax.servlet.annotation.WebServlet;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.tapio.googlemaps.AutocompleteComponent;
 import com.vaadin.tapio.googlemaps.GoogleMap;
 import com.vaadin.tapio.googlemaps.client.GoogleMapControl;
 import com.vaadin.tapio.googlemaps.client.LatLon;
+import com.vaadin.tapio.googlemaps.client.LocationInfo;
+import com.vaadin.tapio.googlemaps.client.events.AutocompletePlaceChangeListener;
 import com.vaadin.tapio.googlemaps.client.events.InfoWindowClosedListener;
 import com.vaadin.tapio.googlemaps.client.events.MapClickListener;
 import com.vaadin.tapio.googlemaps.client.events.MapMoveListener;
@@ -20,6 +23,7 @@ import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapMarker;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapPolygon;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapPolyline;
 import com.vaadin.tapio.googlemaps.demo.events.OpenInfoWindowOnMarkerClickListener;
+import com.vaadin.tapio.googlemaps.exception.GoogleMapException;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 
@@ -29,19 +33,22 @@ import com.vaadin.ui.Button.ClickEvent;
 @SuppressWarnings("serial")
 public class DemoUI extends UI {
 
+	private AutocompleteComponent autocompleteComponent;
     private GoogleMap googleMap;
     private GoogleMapMarker kakolaMarker = new GoogleMapMarker(
         "DRAGGABLE: Kakolan vankila", new LatLon(60.44291, 22.242415),
         true, null);
     private GoogleMapInfoWindow kakolaInfoWindow = new GoogleMapInfoWindow(
         "Kakola used to be a provincial prison.", kakolaMarker);
+//    private GoogleMapMarker autoMarker = new GoogleMapMarker("AutoTest",
+//            new LatLon(60.536403, 22.344648), true);
     private GoogleMapMarker maariaMarker = new GoogleMapMarker("Maaria",
-        new LatLon(60.536403, 22.344648), false);
+        new LatLon(60.536403, 22.344648), true);
     private GoogleMapInfoWindow maariaWindow = new GoogleMapInfoWindow(
         "Maaria is a district of Turku", maariaMarker);
     ;
     private Button componentToMaariaInfoWindowButton;
-    private final String apiKey = "";
+    private final String apiKey = "AIzaSyAFAFK7uahfs_Qf07hy-_cM2w5DbQwcYt4";
 
     @WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = DemoUI.class, widgetset = "com.vaadin.tapio.googlemaps.demo.DemoWidgetset")
@@ -63,7 +70,7 @@ public class DemoUI extends UI {
         tabs.addTab(mapContent, "The map map");
         tabs.addTab(new Label("An another tab"), "The other tab");
 
-        googleMap = new GoogleMap(null, null, null);
+        googleMap = new GoogleMap(apiKey, null, null);
         // uncomment to enable Chinese API.
         //googleMap.setApiUrl("maps.google.cn");
         googleMap.setCenter(new LatLon(60.440963, 22.25122));
@@ -76,6 +83,7 @@ public class DemoUI extends UI {
         googleMap.addMarker("NOT DRAGGABLE: Iso-Heikkilä", new LatLon(
             60.450403, 22.230399), false, null);
         googleMap.addMarker(maariaMarker);
+//        googleMap.addMarker(autoMarker);
         googleMap.setMinZoom(4);
         googleMap.setMaxZoom(16);
 
@@ -90,6 +98,28 @@ public class DemoUI extends UI {
         final CssLayout consoleLayout = new CssLayout();
         console.setContent(consoleLayout);
         mapContent.addComponent(console);
+        
+        try {
+			autocompleteComponent = new AutocompleteComponent(googleMap);
+//	        autocompleteComponent.setBounds(null, null);
+	        autocompleteComponent.addAutocompletePlaceChangeListener(new AutocompletePlaceChangeListener() {
+				
+				@Override
+				public void placeChanged(LocationInfo locationInfo) {
+//					autoMarker.setCaption(locationInfo.getFormatedAddress());
+//					autoMarker.setPosition(locationInfo.getPosition());
+					
+					GoogleMapMarker autoMarker = new GoogleMapMarker(locationInfo.getAddress(),
+				            new LatLon(locationInfo.getPosition().getLat(), locationInfo.getPosition().getLon()), true);
+					googleMap.addMarker(autoMarker);
+				}
+			});
+	        
+	        mapContent.addComponent(autocompleteComponent);
+		} catch (GoogleMapException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         HorizontalLayout buttonLayoutRow1 = new HorizontalLayout();
         buttonLayoutRow1.setHeight("26px");
@@ -98,7 +128,7 @@ public class DemoUI extends UI {
         HorizontalLayout buttonLayoutRow2 = new HorizontalLayout();
         buttonLayoutRow2.setHeight("26px");
         mapContent.addComponent(buttonLayoutRow2);
-
+        
         OpenInfoWindowOnMarkerClickListener infoWindowOpener = new OpenInfoWindowOnMarkerClickListener(
             googleMap, kakolaMarker, kakolaInfoWindow);
 
@@ -123,8 +153,9 @@ public class DemoUI extends UI {
                     + center.getLat() + ", " + center.getLon() + "), zoom "
                     + zoomLevel + ", boundsNE: (" + boundsNE.getLat()
                     + ", " + boundsNE.getLon() + "), boundsSW: ("
-                    + boundsSW.getLat() + ", " + boundsSW.getLon() + ")");
+                    + boundsSW.getLat() + ", " + boundsSW.getLon() + ")" + googleMap.getState());
                 consoleLayout.addComponent(consoleEntry, 0);
+                autocompleteComponent.setBounds(boundsSW, boundsNE);
             }
         });
 

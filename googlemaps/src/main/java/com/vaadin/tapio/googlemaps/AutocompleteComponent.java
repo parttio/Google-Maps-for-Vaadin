@@ -3,6 +3,7 @@ package com.vaadin.tapio.googlemaps;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.maps.client.placeslib.AutocompleteType;
 import com.vaadin.tapio.googlemaps.client.AutocompleteComponentState;
 import com.vaadin.tapio.googlemaps.client.LatLon;
 import com.vaadin.tapio.googlemaps.client.LocationInfo;
@@ -12,7 +13,7 @@ import com.vaadin.tapio.googlemaps.exception.GoogleMapException;
 import com.vaadin.tapio.googlemaps.exception.MissingApiKeyException;
 
 /**
- * The class representing Google Maps.
+ * The class representing Google Map's autocomplete component.
  * @author panpasy
  */
 public class AutocompleteComponent extends com.vaadin.ui.AbstractComponent { 
@@ -34,10 +35,16 @@ public class AutocompleteComponent extends com.vaadin.ui.AbstractComponent {
         }
     };
     
+    /**
+     * Constructor
+     * 
+     * @param googleMap google map used to initial the auto-complete component, API key is required
+     * @throws GoogleMapException
+     */
     public AutocompleteComponent(GoogleMap googleMap) throws GoogleMapException {
     	this(googleMap.getState().apiKey, googleMap.getState().clientId, googleMap.getState().language);
     	this.googleMap = googleMap;
-    	setBounds(this.googleMap.getState().boundsNE, this.googleMap.getState().boundsSW );
+//    	setBounds(this.googleMap.getState().boundsNE, this.googleMap.getState().boundsSW );
     }
     
     public AutocompleteComponent(String apiKey, String clientId, String language) throws GoogleMapException {    	
@@ -73,9 +80,22 @@ public class AutocompleteComponent extends com.vaadin.ui.AbstractComponent {
         return getState().locationInfo;
     }
     
+    /**
+     * Set bound
+     * @param boundsSW
+     * @param boundsNE
+     */
     public void setBounds(LatLon boundsSW, LatLon boundsNE) {
     	getState().boundsSW = boundsSW;
     	getState().boundsNE = boundsNE;
+    }
+    
+    /**
+     * Set types, ESTABLISHMENT&GEOCODE by default if not set the types
+     * @param types
+     */
+    public void setTypes( List<AutocompleteType> types ) {
+    	getState().types = types;
     }
     
     /**

@@ -10,7 +10,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.maps.client.LoadApi;
 import com.google.gwt.maps.client.MapTypeId;
 import com.google.gwt.maps.client.MapWidget;
-import com.google.gwt.maps.client.LoadApi.LoadLibrary;
 import com.google.gwt.maps.client.base.LatLng;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -73,13 +72,6 @@ public class GoogleMapConnector extends AbstractComponentContainerConnector
         }
         loadingApi = true;
 		ArrayList<LoadApi.LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
-//		loadLibraries.add(LoadLibrary.ADSENSE);
-//		loadLibraries.add(LoadLibrary.DRAWING);
-//		loadLibraries.add(LoadLibrary.GEOMETRY);
-//		loadLibraries.add(LoadLibrary.PANORAMIO);
-//		loadLibraries.add(LoadLibrary.PLACES);
-//		loadLibraries.add(LoadLibrary.WEATHER);
-//		loadLibraries.add(LoadLibrary.VISUALIZATION);
         Runnable onLoad = new Runnable() {
             @Override
             public void run() {
@@ -178,6 +170,9 @@ public class GoogleMapConnector extends AbstractComponentContainerConnector
             getWidget().triggerResize();
         }
 		onConnectorHierarchyChange(null);
+		
+//        getState().boundsNE = new LatLon(getWidget().map.getBounds().getNorthEast().getLatitude(), getWidget().map.getBounds().getNorthEast().getLongitude());
+//        getState().boundsSW = new LatLon(getWidget().map.getBounds().getSouthWest().getLatitude(), getWidget().map.getBounds().getSouthWest().getLongitude());
     }
 
     protected void updateVisibleAreaAndCenterBoundLimits() {
