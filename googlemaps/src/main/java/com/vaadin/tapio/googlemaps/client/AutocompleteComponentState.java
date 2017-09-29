@@ -12,8 +12,8 @@ import com.google.gwt.maps.client.placeslib.AutocompleteType;
 public class AutocompleteComponentState extends SharedState {
     // State can have both public variable and bean properties
 	public LocationInfo locationInfo = new LocationInfo(); 
-	public LatLon boundsNE = new LatLon();
-	public LatLon boundsSW = new LatLon();
+	public LatLon boundsNE = new LatLon(0.0, 0.0);
+	public LatLon boundsSW = new LatLon(0.0, 0.0);
 	
 	public List<AutocompleteType> types = new ArrayList<>();
 	

@@ -1,12 +1,13 @@
 package com.vaadin.tapio.googlemaps.client;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.google.gwt.ajaxloader.client.AjaxLoader;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.maps.client.LoadApi;
 import com.google.gwt.maps.client.LoadApi.LoadLibrary;
 import com.google.gwt.maps.client.placeslib.AutocompleteType;
-import com.vaadin.client.annotations.OnStateChange;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.communication.StateChangeEvent;
 import com.vaadin.client.ui.AbstractComponentConnector;
@@ -18,6 +19,7 @@ import com.vaadin.tapio.googlemaps.client.rpcs.AutocompletePlaceChangedRpc;
 @Connect(AutocompleteComponent.class)
 public class AutocompleteComponentConnector extends AbstractComponentConnector implements AutocompletePlaceChangeListener{
 
+	private final static Logger logger = Logger.getLogger(AutocompleteComponentConnector.class.getName());
 	private static final long serialVersionUID = 3708269877164761235L;
 	// ServerRpc is used to send events to server. Communication implementation
     // is automatically created here
@@ -31,7 +33,7 @@ public class AutocompleteComponentConnector extends AbstractComponentConnector i
 //			loadMapApi();
 //		}
         // We choose listed for mouse clicks for the widget
-        getWidget().setPlaceChangeListener(this);
+//        getWidget().setPlaceChangeListener(this);
 //        getWidget().init();
 
     }
@@ -76,14 +78,18 @@ public class AutocompleteComponentConnector extends AbstractComponentConnector i
         }
 
         LoadApi.go(onLoad, loadLibraries, false, language, params);
+        logger.log(Level.INFO, "************libraries load successfully********" + params);
     }
     
     protected void initAutocompleteComponent() {
-        GWT.log("************Init auto complete component********");
+        logger.log(Level.INFO, "************Init auto complete component********");
         getWidget().init();
-
-        onBoundsChange();
-        onTypesChange();
+        getWidget().setPlaceChangeListener(this);
+//        onBoundsChange();
+//        onTypesChange();
+        
+        getWidget().setBounds( getState().boundsNE, getState().boundsSW );
+        getWidget().setTypes( getState().types.toArray( new AutocompleteType[getState().types.size()] ) );
     }
 	
     // We must implement getWidget() to cast to correct type 
@@ -99,29 +105,32 @@ public class AutocompleteComponentConnector extends AbstractComponentConnector i
         return (AutocompleteComponentState) super.getState();
     }
     
-    @OnStateChange(value={"boundsNE", "boundsSW"})
-    private void onBoundsChange() {
-        GWT.log("Auto complete component bounds changed to NE(" +  getState().boundsNE.getLat() + ", " + getState().boundsNE.getLon() + "), SW(" + getState().boundsSW.getLat() + ", " + getState().boundsSW.getLon() + ")");
-        getWidget().setBounds( getState().boundsNE, getState().boundsSW );
-    }
-    
-    @OnStateChange(value={"types"})
-    private void onTypesChange() {
-        GWT.log( "Auto complete component type's count " + getState().types.size() );
-        getWidget().setTypes( getState().types.toArray( new AutocompleteType[getState().types.size()] ) );
-    }
+//    @OnStateChange(value={"boundsNE", "boundsSW"})
+//    private void onBoundsChange() {
+//        GWT.log("Auto complete component bounds changed to NE(" +  getState().boundsNE.getLat() + ", " + getState().boundsNE.getLon() + "), SW(" + getState().boundsSW.getLat() + ", " + getState().boundsSW.getLon() + ")");
+////        getWidget().setBounds( getState().boundsNE, getState().boundsSW );
+//    }
+//    
+//    @OnStateChange(value={"types"})
+//    private void onTypesChange() {
+//        GWT.log( "Auto complete component type's count " + getState().types.size() );
+////        getWidget().setTypes( getState().types.toArray( new AutocompleteType[getState().types.size()] ) );
+//    }
 
     // Whenever the state changes in the server-side, this method is called
     @Override
     public void onStateChanged(StateChangeEvent stateChangeEvent) {
         super.onStateChanged(stateChangeEvent);
-        
+        logger.log(Level.INFO, "************Start loading auto-complete component**************" + apiLoaded);
         if (!apiLoaded) {
             loadMapApi();
             return;
         } else if (getWidget().autoComplete == null) {
             initAutocompleteComponent();
         }
+        
+        getWidget().setBounds( getState().boundsNE, getState().boundsSW );
+        getWidget().setTypes( getState().types.toArray( new AutocompleteType[getState().types.size()] ) );
     }
 
 	@Override

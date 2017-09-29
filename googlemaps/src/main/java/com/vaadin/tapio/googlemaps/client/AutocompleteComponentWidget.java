@@ -1,5 +1,8 @@
 package com.vaadin.tapio.googlemaps.client;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.maps.client.base.LatLng;
@@ -19,6 +22,7 @@ import com.vaadin.tapio.googlemaps.client.events.AutocompletePlaceChangeListener
  * @author panpasy
  */
 public class AutocompleteComponentWidget extends TextBox {
+	private final static Logger logger = Logger.getLogger(AutocompleteComponentWidget.class.getName());
 
 	protected AutocompleteOptions options;
 	protected Autocomplete autoComplete;
@@ -32,6 +36,7 @@ public class AutocompleteComponentWidget extends TextBox {
     
     public void init() {
 
+    	logger.log(Level.INFO, "AutocompleteComponentWidget intialization");
         Element element = getElement();
 
         options = AutocompleteOptions.newInstance();
@@ -39,8 +44,15 @@ public class AutocompleteComponentWidget extends TextBox {
         // Initial type is EXPLICIT_TYPES
 //        options.setTypes( AutocompleteType.ESTABLISHMENT, AutocompleteType.GEOCODE );
 //        options.setBounds(mapWidget.getBounds());
+        AutocompleteType[] types = new AutocompleteType[2];
+        types[0] = AutocompleteType.ESTABLISHMENT;
+        types[1] = AutocompleteType.GEOCODE;
+        
+        options.setTypes(types);
+    	logger.log(Level.INFO, "AutocompleteComponentWidget%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
         autoComplete = Autocomplete.newInstance(element, options);
+    	logger.log(Level.INFO, "AutocompleteComponentWidget )))))))))))))))))))))))))))))");
 
         autoComplete.addPlaceChangeHandler(new PlaceChangeMapHandler() {
           public void onEvent(PlaceChangeMapEvent event) {
@@ -52,7 +64,7 @@ public class AutocompleteComponentWidget extends TextBox {
 	            PlaceGeometry geomtry = result.getGeometry();
 	            LatLng center = geomtry.getLocation();
 
-	            GWT.log("place changed center=" + center);
+	            logger.log(Level.INFO, "place changed center=" + center);
 				                    
                 placeChangeListener.placeChanged(new LocationInfo(result.getFormatted_Address(), new LatLon( center.getLatitude(), center.getLongitude() )));
 			}
@@ -69,7 +81,7 @@ public class AutocompleteComponentWidget extends TextBox {
 
         LatLngBounds bounds = LatLngBounds.newInstance(sw, ne);
         
-        autoComplete.setBounds(bounds);
+        options.setBounds(bounds);
 	}
 	
 	public void setPlaceChangeListener(AutocompletePlaceChangeListener placeChangeListener) {

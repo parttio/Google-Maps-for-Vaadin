@@ -37,8 +37,8 @@ public class GoogleMapState extends SharedState {
     public LatLon centerSWLimit = new LatLon(0.0, 0.0);
     public LatLon centerNELimit = new LatLon(0.0, 0.0);
     
-    public LatLon boundsNE = null;
-    public LatLon boundsSW = null;
+    public LatLon boundsNE = new LatLon(0.0, 0.0);
+    public LatLon boundsSW = new LatLon(0.0, 0.0);
 
     public boolean limitVisibleAreaBounds = false;
     public LatLon visibleAreaSWLimit = new LatLon(0.0, 0.0);
