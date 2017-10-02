@@ -44,12 +44,12 @@ public class AutocompleteComponentWidget extends TextBox {
         // Initial type is EXPLICIT_TYPES
 //        options.setTypes( AutocompleteType.ESTABLISHMENT, AutocompleteType.GEOCODE );
 //        options.setBounds(mapWidget.getBounds());
-        AutocompleteType[] types = new AutocompleteType[2];
-        types[0] = AutocompleteType.ESTABLISHMENT;
-        types[1] = AutocompleteType.GEOCODE;
-        
-        options.setTypes(types);
-    	logger.log(Level.INFO, "AutocompleteComponentWidget%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+//        AutocompleteType[] types = new AutocompleteType[2];
+//        types[0] = AutocompleteType.ESTABLISHMENT;
+//        types[1] = AutocompleteType.GEOCODE;
+//        
+//        options.setTypes(types);
+//    	logger.log(Level.INFO, "AutocompleteComponentWidget%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
         autoComplete = Autocomplete.newInstance(element, options);
     	logger.log(Level.INFO, "AutocompleteComponentWidget )))))))))))))))))))))))))))))");
