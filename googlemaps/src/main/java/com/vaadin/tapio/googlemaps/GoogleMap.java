@@ -75,6 +75,10 @@ public class GoogleMap extends AbstractComponentContainer {
             LatLon boundsSW) {
             getState().zoom = zoomLevel;
             getState().center = center;
+            
+            getState().boundsNE = boundsNE;
+            getState().boundsSW = boundsSW;
+            
             fitToBounds(null, null);
 
             for (MapMoveListener listener : mapMoveListeners) {
@@ -176,7 +180,7 @@ public class GoogleMap extends AbstractComponentContainer {
      * @see com.vaadin.ui.AbstractComponent#getState()
      */
     @Override
-    protected GoogleMapState getState() {
+    public GoogleMapState getState() {
         return (GoogleMapState) super.getState();
     }
 

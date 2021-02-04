@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gwt.ajaxloader.client.AjaxLoader;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.maps.client.LoadApi;
 import com.google.gwt.maps.client.MapTypeId;
 import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.LoadApi.LoadLibrary;
 import com.google.gwt.maps.client.base.LatLng;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -41,6 +44,7 @@ import com.vaadin.tapio.googlemaps.client.rpcs.MarkerDraggedRpc;
 public class GoogleMapConnector extends AbstractComponentContainerConnector
     implements MarkerClickListener, MapMoveListener, MapClickListener,
     MarkerDragListener, InfoWindowClosedListener, MapTypeChangeListener {
+	private final static Logger logger = Logger.getLogger(GoogleMapConnector.class.getName());
 
     private static final long serialVersionUID = -357262975672050103L;
 
@@ -71,7 +75,14 @@ public class GoogleMapConnector extends AbstractComponentContainerConnector
             return;
         }
         loadingApi = true;
-        ArrayList<LoadApi.LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
+		ArrayList<LoadApi.LoadLibrary> loadLibraries = new ArrayList<LoadApi.LoadLibrary>();
+		loadLibraries.add(LoadLibrary.ADSENSE);
+		loadLibraries.add(LoadLibrary.DRAWING);
+		loadLibraries.add(LoadLibrary.GEOMETRY);
+		loadLibraries.add(LoadLibrary.PANORAMIO);
+		loadLibraries.add(LoadLibrary.PLACES);
+		loadLibraries.add(LoadLibrary.WEATHER);
+		loadLibraries.add(LoadLibrary.VISUALIZATION);
         Runnable onLoad = new Runnable() {
             @Override
             public void run() {
@@ -171,6 +182,11 @@ public class GoogleMapConnector extends AbstractComponentContainerConnector
             getWidget().triggerResize();
         }
 		onConnectorHierarchyChange(null);
+		
+//        getState().boundsNE = new LatLon(getWidget().map.getBounds().getNorthEast().getLatitude(), getWidget().map.getBounds().getNorthEast().getLongitude());
+//        getState().boundsSW = new LatLon(getWidget().map.getBounds().getSouthWest().getLatitude(), getWidget().map.getBounds().getSouthWest().getLongitude());
+//        logger.log(Level.INFO, "boundsNE : (" + getState().boundsNE.getLat() + ", " + getState().boundsNE.getLon() + "), boundsSW : (" + + getState().boundsSW.getLat() + ", " + getState().boundsSW.getLon() + ")" );
+
     }
 
     protected void updateVisibleAreaAndCenterBoundLimits() {

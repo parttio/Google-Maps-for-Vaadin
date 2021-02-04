@@ -6,9 +6,12 @@ import javax.servlet.annotation.WebServlet;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.tapio.googlemaps.AutocompleteComponent;
 import com.vaadin.tapio.googlemaps.GoogleMap;
 import com.vaadin.tapio.googlemaps.client.GoogleMapControl;
 import com.vaadin.tapio.googlemaps.client.LatLon;
+import com.vaadin.tapio.googlemaps.client.LocationInfo;
+import com.vaadin.tapio.googlemaps.client.events.AutocompletePlaceChangeListener;
 import com.vaadin.tapio.googlemaps.client.events.InfoWindowClosedListener;
 import com.vaadin.tapio.googlemaps.client.events.MapClickListener;
 import com.vaadin.tapio.googlemaps.client.events.MapMoveListener;
@@ -20,6 +23,7 @@ import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapMarker;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapPolygon;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapPolyline;
 import com.vaadin.tapio.googlemaps.demo.events.OpenInfoWindowOnMarkerClickListener;
+import com.vaadin.tapio.googlemaps.exception.GoogleMapException;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 
@@ -30,6 +34,7 @@ import com.vaadin.ui.Button.ClickEvent;
 public class DemoUI extends UI {
 
     private GoogleMap googleMap;
+    private AutocompleteComponent autocompleteComponent;
     private GoogleMapMarker kakolaMarker = new GoogleMapMarker(
         "DRAGGABLE: Kakolan vankila", new LatLon(60.44291, 22.242415),
         true, null);
@@ -41,7 +46,7 @@ public class DemoUI extends UI {
         "Maaria is a district of Turku", maariaMarker);
     ;
     private Button componentToMaariaInfoWindowButton;
-    private final String apiKey = "";
+    private final String apiKey = "AIzaSyCWezJoI8FsanC4Ez8vd0FLmmMWK2mF4ug";
 
     @WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = DemoUI.class, widgetset = "com.vaadin.tapio.googlemaps.demo.DemoWidgetset")
@@ -60,10 +65,13 @@ public class DemoUI extends UI {
 
         VerticalLayout mapContent = new VerticalLayout();
         mapContent.setSizeFull();
+        
+//        MapWithAutoComplete mapWithAutoComplete = new MapWithAutoComplete();
         tabs.addTab(mapContent, "The map map");
+//        tabs.addTab(mapWithAutoComplete, "The map with auto-complete");
         tabs.addTab(new Label("An another tab"), "The other tab");
 
-        googleMap = new GoogleMap(null, null, null);
+        googleMap = new GoogleMap(apiKey, null, null);
         // uncomment to enable Chinese API.
         //googleMap.setApiUrl("maps.google.cn");
         googleMap.setCenter(new LatLon(60.440963, 22.25122));
@@ -82,6 +90,24 @@ public class DemoUI extends UI {
         kakolaInfoWindow.setWidth("400px");
         kakolaInfoWindow.setHeight("500px");
 
+        try {
+			autocompleteComponent = new AutocompleteComponent(googleMap);
+	        autocompleteComponent.addAutocompletePlaceChangeListener(new AutocompletePlaceChangeListener() {
+				@Override
+				public void placeChanged(LocationInfo locationInfo) {
+					
+					GoogleMapMarker autoMarker = new GoogleMapMarker(locationInfo.getAddress(),
+				            new LatLon(locationInfo.getPosition().getLat(), locationInfo.getPosition().getLon()), true);
+					googleMap.addMarker(autoMarker);
+				}
+			});
+	        
+	        mapContent.addComponent(autocompleteComponent);
+		} catch (GoogleMapException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
         mapContent.addComponent(googleMap);
         mapContent.setExpandRatio(googleMap, 1.0f);
 
