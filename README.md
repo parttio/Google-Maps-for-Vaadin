@@ -35,6 +35,7 @@ In order to use Google Maps API, you'll need to get an API key from [Google Deve
 
 * Map move
 * Map click
+* Map initialized
 * Marker drag
 * Marker click
 * Info window close

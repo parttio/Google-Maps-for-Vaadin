@@ -32,6 +32,7 @@ import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapInfoWindow;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapMarker;
 import com.vaadin.tapio.googlemaps.client.rpcs.InfoWindowClosedRpc;
 import com.vaadin.tapio.googlemaps.client.rpcs.MapClickedRpc;
+import com.vaadin.tapio.googlemaps.client.rpcs.MapInitializedRpc;
 import com.vaadin.tapio.googlemaps.client.rpcs.MapMovedRpc;
 import com.vaadin.tapio.googlemaps.client.rpcs.MapTypeChangedRpc;
 import com.vaadin.tapio.googlemaps.client.rpcs.MarkerClickedRpc;
@@ -56,6 +57,8 @@ public class GoogleMapConnector extends AbstractComponentContainerConnector
         this);
     private final MapClickedRpc mapClickRpc = RpcProxy
         .create(MapClickedRpc.class, this);
+    private final MapInitializedRpc mapInitializedRpc = RpcProxy
+        .create(MapInitializedRpc.class, this);
     private final MarkerDraggedRpc markerDraggedRpc = RpcProxy
         .create(MarkerDraggedRpc.class, this);
     private final InfoWindowClosedRpc infoWindowClosedRpc = RpcProxy
@@ -124,6 +127,7 @@ public class GoogleMapConnector extends AbstractComponentContainerConnector
         for (GoogleMapInitListener listener : initListeners) {
             listener.mapWidgetInitiated(map);
         }
+        mapInitializedRpc.mapInitialized();
     }
 
     @Override

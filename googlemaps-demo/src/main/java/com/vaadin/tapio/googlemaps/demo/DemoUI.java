@@ -20,6 +20,7 @@ import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapMarker;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapPolygon;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapPolyline;
 import com.vaadin.tapio.googlemaps.demo.events.OpenInfoWindowOnMarkerClickListener;
+import com.vaadin.tapio.googlemaps.events.MapInitializedListener;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 
@@ -98,6 +99,22 @@ public class DemoUI extends UI {
         HorizontalLayout buttonLayoutRow2 = new HorizontalLayout();
         buttonLayoutRow2.setHeight("26px");
         mapContent.addComponent(buttonLayoutRow2);
+
+        googleMap.addMapInitializedListener(new MapInitializedListener() {
+            @Override
+            public void mapInitialized(GoogleMap source) {
+                // At this point the map has been drawn.
+                // So for example you can set initial viewport by uncommenting the line below.
+
+                // fitToBounds only works when the map has size (has been drawn)
+                // https://developers.google.com/maps/documentation/javascript/reference/map#Map.fitBounds
+
+                //source.fitToBounds(maariaMarker.getPosition(), kakolaMarker.getPosition())
+
+                Label consoleEntry = new Label("Map has been initialized.");
+                consoleLayout.addComponent(consoleEntry, 0);
+            }
+        });
 
         OpenInfoWindowOnMarkerClickListener infoWindowOpener = new OpenInfoWindowOnMarkerClickListener(
             googleMap, kakolaMarker, kakolaInfoWindow);

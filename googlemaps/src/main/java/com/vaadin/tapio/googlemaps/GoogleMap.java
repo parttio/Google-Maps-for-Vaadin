@@ -26,10 +26,12 @@ import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapPolyline;
 import com.vaadin.tapio.googlemaps.client.overlays.GoogleMapCircle;
 import com.vaadin.tapio.googlemaps.client.rpcs.InfoWindowClosedRpc;
 import com.vaadin.tapio.googlemaps.client.rpcs.MapClickedRpc;
+import com.vaadin.tapio.googlemaps.client.rpcs.MapInitializedRpc;
 import com.vaadin.tapio.googlemaps.client.rpcs.MapMovedRpc;
 import com.vaadin.tapio.googlemaps.client.rpcs.MapTypeChangedRpc;
 import com.vaadin.tapio.googlemaps.client.rpcs.MarkerClickedRpc;
 import com.vaadin.tapio.googlemaps.client.rpcs.MarkerDraggedRpc;
+import com.vaadin.tapio.googlemaps.events.MapInitializedListener;
 import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -93,6 +95,15 @@ public class GoogleMap extends AbstractComponentContainer {
         }
     };
 
+    private final MapInitializedRpc mapInitializedRpc = new MapInitializedRpc() {
+        @Override
+        public void mapInitialized() {
+            for (MapInitializedListener mapInitializedListener : mapInitializedListeners) {
+                mapInitializedListener.mapInitialized(GoogleMap.this);
+            }
+        }
+    };
+
     private final InfoWindowClosedRpc infoWindowClosedRpc = new InfoWindowClosedRpc() {
 
         @Override
@@ -119,6 +130,8 @@ public class GoogleMap extends AbstractComponentContainer {
     private final List<MapMoveListener> mapMoveListeners = new ArrayList<>();
 
     private final List<MapClickListener> mapClickListeners = new ArrayList<>();
+
+    private final List<MapInitializedListener> mapInitializedListeners = new ArrayList<>();
 
     private final List<MarkerDragListener> markerDragListeners = new ArrayList<>();
 
@@ -165,6 +178,7 @@ public class GoogleMap extends AbstractComponentContainer {
         registerRpc(markerClickedRpc);
         registerRpc(mapMovedRpc);
         registerRpc(mapClickedRpc);
+        registerRpc(mapInitializedRpc);
         registerRpc(markerDraggedRpc);
         registerRpc(infoWindowClosedRpc);
         registerRpc(mapTypeChangedRpc);
@@ -347,6 +361,24 @@ public class GoogleMap extends AbstractComponentContainer {
      */
     public void removeMapClickListener(MapClickListener listener) {
         mapClickListeners.remove(listener);
+    }
+
+    /**
+     * Adds a MapInitializedListener to the map.
+     *
+     * @param listener The listener to add.
+     */
+    public void addMapInitializedListener(MapInitializedListener listener) {
+        mapInitializedListeners.add(listener);
+    }
+
+    /**
+     * Removes a MapInitializedListener from the map.
+     *
+     * @param listener The listener to remove.
+     */
+    public void removeMapInitializedListener(MapInitializedListener listener) {
+        mapInitializedListeners.remove(listener);
     }
 
     /**
